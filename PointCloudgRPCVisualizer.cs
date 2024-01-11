@@ -34,7 +34,7 @@ namespace Marus.Visualization
         public const int RGB = 6;
         public const int RGBA = 7;
     }
-    public class PointCloudRosVisualizer : Singleton<PointCloudRosVisualizer>
+    public class PointCloudgRPCVisualizer : Singleton<PointCloudgRPCVisualizer>
     {
 
         public string Address = "/unity/pointcloud_visualizer";

@@ -25,7 +25,7 @@ using System;
 
 namespace Marus.Networking
 {
-    public class VisualizationROS : Singleton<VisualizationROS>
+    public class VisualizationgRPC : Singleton<VisualizationgRPC>
     {
         VisualizationClient client;
         ServerStreamer<Marker> streamer1;
