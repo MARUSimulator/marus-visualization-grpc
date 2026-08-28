@@ -1,11 +1,11 @@
 // Copyright 2022 Laboratory for Underwater Systems and Technologies (LABUST)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,6 +40,13 @@ namespace Marus.Networking
             { Marker.Types.Type.Cylinder, PrimitiveType.Cylinder }
         };
 
+        // NEW: Auto-initialize this Singleton before the scene loads
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        static void InitializeOnLoad()
+        {
+            var instance = Instance;
+        }
+
         protected override void Initialize()
         {
             streamer1 = new ServerStreamer<Marker>(UpdateMarker);
@@ -47,12 +54,20 @@ namespace Marus.Networking
 
             RosConnection.Instance.OnConnected += OnConnected;
             namespaces = new HashSet<string>();
+
+            // NEW: Subscribe to Tf frame creation from the core
+            if (TfHandler.Instance != null)
+            {
+                TfHandler.Instance.OnNewTfFrameCreated += HandleNewTfFrame;
+            }
         }
 
         public void OnConnected(ChannelBase channel)
         {
             string address = "/unity/marker";
             string address2 = "/unity/markerArray";
+
+            // GetClient<T> now uses the lazy-loading method we set up in RosConnection
             var client = RosConnection.Instance.GetClient<VisualizationClient>();
 
             streamer1.StartStream(client.SetMarker(
@@ -61,6 +76,21 @@ namespace Marus.Networking
             streamer2.StartStream(client.SetMarkerArray(
                 new MarkerRequest {Address = address2},
                 cancellationToken: RosConnection.Instance.CancellationToken));
+
+            // Apply initial TF filter configuration
+            if (!RosConnection.Instance.DisplayTf)
+            {
+                Visualizer.Instance.DrawFilter |= Visualizer.FilterValues.Transforms;
+            }
+        }
+
+        // Explicitly using UnityEngine.Transform to resolve CS0104
+        private void HandleNewTfFrame(UnityEngine.Transform newTransform)
+        {
+            if (RosConnection.Instance.DisplayTf)
+            {
+                Visualizer.Instance.AddTransform(newTransform, "tf");
+            }
         }
 
         void Update()
@@ -81,7 +111,6 @@ namespace Marus.Networking
                 var id = $"{key}_{response.Id.ToString()}";
                 Visualizer.Instance.RemoveById(id);
             }
-
             else if (response.Action == Marker.Types.Action.Deleteall)
             {
                 foreach (var key in namespaces)
@@ -147,6 +176,15 @@ namespace Marus.Networking
                 return;
             }
             namespaces.Add(key);
+        }
+
+        // NEW: Clean up event subscriptions when the object is destroyed
+        protected virtual void OnDestroy()
+        {
+            if (TfHandler.Instance != null)
+            {
+                TfHandler.Instance.OnNewTfFrameCreated -= HandleNewTfFrame;
+            }
         }
 
         public void UpdateMarkerArray(MarkerArray response)
