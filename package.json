@@ -1,0 +1,17 @@
+{
+  "name": "com.marus2.visualization-grpc",
+  "version": "1.0.0",
+  "displayName": "MARUS2 Visualization gRPC",
+  "description": "gRPC support for visualization modules in MARUS2.",
+  "unity": "6000.3",
+  "unityRelease": "23f1",
+  "dependencies": {
+    "com.marus2.core": "1.0.0",
+    "com.marus2.visualization": "1.0.0",
+    "com.marus-proto": "https://github.com/MARUSimulator/marus2-proto.git#csharp"
+  },
+  "author": {
+    "name": "LABUST",
+    "url": "http://labust.fer.hr/"
+  }
+}
