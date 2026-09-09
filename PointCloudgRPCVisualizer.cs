@@ -59,7 +59,7 @@ namespace Marus.Visualization
 
         }
 
-        public void OnConnected(Channel channel)
+        public void OnConnected(ChannelBase channel)
         {
             var rosConn = RosConnection.Instance;
             if (!_serverStreamer.IsStreaming)
