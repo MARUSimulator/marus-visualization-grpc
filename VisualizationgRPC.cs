@@ -178,10 +178,10 @@ namespace Marus.Networking
             namespaces.Add(key);
         }
 
-        // NEW: Clean up event subscriptions when the object is destroyed
+        // Clean up event subscriptions when the object is destroyed
         protected virtual void OnDestroy()
         {
-            if (TfHandler.Instance != null)
+            if (TfHandler.HasInstance)
             {
                 TfHandler.Instance.OnNewTfFrameCreated -= HandleNewTfFrame;
             }
