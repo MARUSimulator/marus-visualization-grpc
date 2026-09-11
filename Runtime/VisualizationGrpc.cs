@@ -64,8 +64,8 @@ namespace Marus.Networking
 
         public void OnConnected(ChannelBase channel)
         {
-            string address = "/unity/marker";
-            string address2 = "/unity/markerArray";
+            string address = "/marus2/marker";
+            string address2 = "/marus2/markerArray";
 
             // GetClient<T> now uses the lazy-loading method we set up in RosConnection
             var client = RosConnection.Instance.GetClient<VisualizationClient>();
